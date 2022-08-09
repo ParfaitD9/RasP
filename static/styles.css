@@ -1,0 +1,14 @@
+.data {
+    text-align: right;
+    font-size: 55px;
+    color: rgb(0, 38, 255);
+}
+
+.inactive {
+    display: none;
+}
+
+.date {
+    color: black;
+    font-size: 20px;
+}

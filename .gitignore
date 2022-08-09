@@ -1,0 +1,7 @@
+*.zip
+*.docx
+*.odt
+.env
+*.txt
+*.png
+*.svg

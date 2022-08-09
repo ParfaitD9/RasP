@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="/static/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <title>Raspi - Datas</title>
+  </head>
+  <body>
+    <script src="/static/chart.js"></script>
+    <div class="row">
+      <div class="col-3">
+        <div class="card" style="height: 8rem">
+          <p class="card-header">Date</p>
+          <div class="card-body">
+            <p id="time" class="date"></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="card" style="height: 8rem">
+          <p class="card-header">Temperature</p>
+          <div class="card-body">
+            <span id="tmp" class="data"></span><sup>°</sup>
+          </div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="card" style="height: 8rem">
+          <p class="card-header">Humidité</p>
+          <div class="card-body"><span id="hum" class="data"></span> %</div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="card" style="height: 8rem">
+          <p class="card-header">Pression</p>
+          <div class="card-body">
+            <span id="pa" class="data">23</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-danger inactive">
+      <span id="error"></span>
+    </div>
+    <div class="container">
+      <canvas id="myChart"></canvas>
+    </div>
+    <script defer>
+      let tmp = document.getElementById("tmp");
+      let hum = document.getElementById("hum");
+      let time = document.getElementById("time");
+      let press = document.getElementById("pa");
+      let error = document.getElementById("error");
+
+      let data = {
+        labels: [],
+        datasets: [
+          {
+            label: "Température",
+            backgroundColor: "rgb(255, 99, 132)",
+            borderColor: "rgb(255, 99, 132)",
+            data: [],
+          },
+          {
+            label: "Humidité",
+            backgroundColor: "rgb(132, 99, 255)",
+            borderColor: "rgb(132, 99, 255)",
+            data: [],
+          },
+          {
+            label: "Pression",
+            backgroundColor: "rgb(99, 255, 132)",
+            borderColor: "rgb(99, 255, 132)",
+            data: [],
+          },
+        ],
+      };
+
+      let config = {
+        type: "line",
+        data: data,
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              display: true,
+              type: "logarithmic",
+            },
+            x: {
+              maxTicksLimit: 5,
+            },
+          },
+        },
+      };
+
+      let myChart = new Chart(document.getElementById("myChart"), config);
+
+      let hr = new XMLHttpRequest();
+      hr.onreadystatechange = function () {
+        if (hr.readyState === 4) {
+          let response = JSON.parse(hr.responseText);
+          if (!response.error) {
+            error.classList.remove("inactive");
+
+            tmp.textContent = response.tmp;
+            hum.textContent = response.hum;
+            time.textContent = response.time;
+            press.textContent = response.press;
+            let dt = new Date();
+            myChart.data.labels.push(
+              `${dt.getHours()}:${dt.getMinutes()}:${dt.getSeconds()}`
+            );
+            myChart.data.datasets[0].data.push(response.tmp);
+            myChart.data.datasets[1].data.push(response.hum);
+            myChart.data.datasets[2].data.push(response.press);
+
+            myChart.update();
+          } else {
+            if (error.classList.contains("inactive")) {
+              error.classList.remove("inactive");
+            }
+            error.textContent = response.error;
+          }
+        }
+      };
+      window.setInterval((e) => {
+        hr.open("GET", "/api", false);
+        hr.send();
+      }, 2000);
+    </script>
+    <script src="/static/bootstrap.bundle.js"></script>
+  </body>
+</html>
