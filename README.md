@@ -1,4 +1,4 @@
-Ce projet est une implémentation de l'observation des valeurs telles que la température, l'humidité et la pression atmosphérique.
+Ce projet est une implémentation de l'observation des valeurs telles que la température, l'humidité et la pression atmosphérique. Il utilise un serveur Flask pour renvoyer les valeurs mesurer vers le navigateur tout en les enregistrant sous format CSV.
 
 ## Composants
 
